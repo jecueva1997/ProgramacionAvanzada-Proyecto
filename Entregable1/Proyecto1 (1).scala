@@ -35,10 +35,6 @@ val data = spark
 
 // COMMAND ----------
 
-
-
-// COMMAND ----------
-
 // Consultar etnias
 data.groupBy("etnia").count().sort($"count".desc).show
 
@@ -165,3 +161,124 @@ dataAreaIndiH1.groupBy($"grupo_ocupacion".as("Ocupacion de Hombres indígenas"))
 // COMMAND ----------
 
 dataAreaIndiM1.groupBy($"grupo_ocupacion".as("Ocupacion de Mujeres indígenas")).count().sort($"count".desc).show(false)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 6.Cual es ingreso mínino y máximo que ganan los hombres y mujeres de cada etnia seleccionada en el area urbana
+
+// COMMAND ----------
+
+println("Hombres Mestizos")
+dataAreaMesH1.select(min("ingreso_laboral").as("Ingreso mínimo"), max("ingreso_laboral").as("Ingreso máximo")).show
+
+// COMMAND ----------
+
+println("Mujeres Mestizas")
+dataAreaMesM1.select(min("ingreso_laboral").as("Ingreso mínimo"), max("ingreso_laboral").as("Ingreso máximo")).show
+
+// COMMAND ----------
+
+println("Hombres Indígenas")
+dataAreaIndiH1.select(min("ingreso_laboral").as("Ingreso mínimo"), max("ingreso_laboral").as("Ingreso máximo")).show
+
+// COMMAND ----------
+
+println("Mujeres Indígenas")
+dataAreaIndiM1.select(min("ingreso_laboral").as("Ingreso mínimo"), max("ingreso_laboral").as("Ingreso máximo")).show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 7.En que ocupación gana el máximo el hombre y la mujer de las 2 etnias
+
+// COMMAND ----------
+
+println("Hombre Mestizo")
+dataAreaMesH1.select("grupo_ocupacion").where($"ingreso_laboral" === "146030").show(false)
+
+// COMMAND ----------
+
+println("Mujer Mestiza")
+dataAreaMesM1.select("grupo_ocupacion").where($"ingreso_laboral" === "70000").show(false)
+
+// COMMAND ----------
+
+println("Hombre Indígena")
+dataAreaIndiH1.select("grupo_ocupacion").where($"ingreso_laboral" === "44234").show(false)
+
+// COMMAND ----------
+
+println("Mujer Indígena")
+dataAreaIndiM1.select("grupo_ocupacion").where($"ingreso_laboral" === "10000").show(false)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 8.En que rama de actividad se encuentra ganando el ingreso máximo lo hombres y mujeres de las 2 etnias
+
+// COMMAND ----------
+
+println("Hombres Mestizos")
+dataAreaMesH1.select("rama_actividad").where($"grupo_ocupacion" === "01 - Personal direct./admin. pública y empresas" && $"ingreso_laboral" === "146030").show(false)
+
+// COMMAND ----------
+
+println("Mujeres Mestizas")
+dataAreaMesM1.select("rama_actividad").where($"grupo_ocupacion" === "01 - Personal direct./admin. pública y empresas" && $"ingreso_laboral" === "70000").show(false)
+
+// COMMAND ----------
+
+println("Hombre Indígena")
+dataAreaIndiH1.select("rama_actividad").where($"grupo_ocupacion" === "05 - Trabajad. de los servicios y comerciantes" && $"ingreso_laboral" === "44234").show(false)
+
+// COMMAND ----------
+
+println("Mujer Indígena")
+dataAreaIndiM1.select("rama_actividad").where($"grupo_ocupacion" === "05 - Trabajad. de los servicios y comerciantes" && $"ingreso_laboral" === "10000").show(false)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 9.Cuantos mestizos e indígenas ganan por encima de la media
+
+// COMMAND ----------
+
+dataEtniaMas1.select(mean("ingreso_laboral").as("Media de Mestizos")).show
+
+// COMMAND ----------
+
+val dataMesMedia = dataEtniaMas1.where($"ingreso_laboral" >= "516.6195378181872")
+println(dataMesMedia.count)
+
+// COMMAND ----------
+
+dataEtniaMas2.select(mean("ingreso_laboral").as("Media de Indígenas")).show
+
+// COMMAND ----------
+
+val dataIndiMedia = dataEtniaMas1.where($"ingreso_laboral" >= "297.09649890123956")
+println(dataIndiMedia.count)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 10.De acuerdo a la pregunta anterior que porcentaje son hombres y mujeres
+
+// COMMAND ----------
+
+val dataMesMediaH = dataMesMedia.where($"genero" === "1 - Hombre")
+val dataMesMediaM = dataMesMedia.where($"genero" === "2 - Mujer")
+
+// COMMAND ----------
+
+println(f"${(dataMesMediaH.count / dataMesMedia.count.toDouble) * 100}%.2f%% Hombres\n${(dataMesMediaM.count / dataMesMedia.count.toDouble) * 100}%.2f%% Mujeres")
+
+// COMMAND ----------
+
+val dataIndiMediaH = dataIndiMedia.where($"genero" === "1 - Hombre")
+val dataIndiMediaM = dataIndiMedia.where($"genero" === "2 - Mujer")
+
+// COMMAND ----------
+
+println(f"${(dataIndiMediaH.count / dataIndiMedia.count.toDouble) * 100}%.2f%% Hombres\n${(dataIndiMediaM.count / dataIndiMedia.count.toDouble) * 100}%.2f%% Mujeres")
