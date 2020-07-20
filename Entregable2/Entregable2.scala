@@ -294,3 +294,130 @@ dataOcupacionIndigenasU_H.show(false)
 dataOcupacionIndigenasU_M.show(false)
 dataOcupacionIndigenasR_H.show(false)
 dataOcupacionIndigenasR_M.show(false)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 5.Cual es ingreso máximo que ganan los hombres y mujeres de cada etnia seleccionada en el area urbana y rural
+
+// COMMAND ----------
+
+// DBTITLE 1,Ingreso Max de Mestizos
+val dataIngresoMaxMestizos = dataEtniaMas1.groupBy("area").pivot("genero").max("ingreso_laboral").orderBy("area")
+dataIngresoMaxMestizos.show
+
+// COMMAND ----------
+
+display(dataIngresoMaxMestizos)
+
+// COMMAND ----------
+
+// DBTITLE 1,Ingreso Max de Indígenas
+val dataIngresoMaxIndigenas = dataEtniaMas2.groupBy("area").pivot("genero").max("ingreso_laboral").orderBy("area")
+dataIngresoMaxIndigenas.show
+
+// COMMAND ----------
+
+display(dataIngresoMaxIndigenas)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 6.En que ocupación gana el máximo el hombre y la mujer de las 2 etnias en cada area
+
+// COMMAND ----------
+
+// DBTITLE 1,Etnia Mestizos
+dataMestizosU_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2784").distinct.show(false)
+dataMestizosU_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2790").distinct.show(false)
+dataMestizosR_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2783").distinct.show(false)
+dataMestizosR_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2766").distinct.show(false)
+
+// COMMAND ----------
+
+// DBTITLE 1,Etnia Indígena
+dataIndigenasU_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2764").distinct.show(false)
+dataIndigenasU_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2780").distinct.show(false)
+dataIndigenasR_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2790").distinct.show(false)
+dataIndigenasR_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2741").distinct.show(false)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 7.En que rama de actividad se encuentra ganando el ingreso máximo lo hombres y mujeres de las 2 etnias en cada area
+
+// COMMAND ----------
+
+// DBTITLE 1,Etnia Mestizos
+dataMestizosU_H.select($"rama_actividad".as("Actividad de Hombres del area Urbana")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2784").show(false)
+
+dataMestizosU_M.select($"rama_actividad".as("Actividad de Mujeres del area Urbana")).where(($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" || $"grupo_ocupacion" === "03 - Técnicos y profesionales de nivel medio") && $"ingreso_laboral" === "2790").show(false)
+
+dataMestizosR_H.select($"rama_actividad".as("Actividad de Hombres del area Rural")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2783").show(false)
+
+dataMestizosR_M.select($"rama_actividad".as("Actividad de Mujeres del area Rural")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2766").show(false)
+
+// COMMAND ----------
+
+// DBTITLE 1,Etnia Indígena
+dataIndigenasU_H.select($"rama_actividad".as("Actividad de Hombres del area Urbana")).where($"grupo_ocupacion" === "05 - Trabajad. de los servicios y comerciantes" && $"ingreso_laboral" === "2764").show(false)
+
+dataIndigenasU_M.select($"rama_actividad".as("Actividad de Mujeres del area Urbana")).where($"grupo_ocupacion" === "05 - Trabajad. de los servicios y comerciantes" && $"ingreso_laboral" === "2780").show(false)
+
+dataIndigenasR_H.select($"rama_actividad".as("Actividad de Hombres del area Rural")).where($"grupo_ocupacion" === "01 - Personal direct./admin. pública y empresas" && $"ingreso_laboral" === "2790").show(false)
+
+dataIndigenasR_M.select($"rama_actividad".as("Actividad de Mujeres del area Rural")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2741").show(false)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 8.Cuantos mestizos e indígenas ganan por encima de la media
+
+// COMMAND ----------
+
+// DBTITLE 1,Etnia Mestizos
+// sacamos la media de todos los datos de mestizos sin outliers
+dataEtniaMas1.select(mean("ingreso_laboral").as("Media de Mestizos")).show
+
+// COMMAND ----------
+
+// mestizos que ganan por encima de la media
+val dataMesMedia = dataEtniaMas1.where($"ingreso_laboral" >= "516.6195378181872")
+println(dataMesMedia.count)
+
+// COMMAND ----------
+
+// DBTITLE 1,Etnia Indígena
+// sacamos la media de todos los datos de indigenas sin outliers
+dataEtniaMas2.select(mean("ingreso_laboral").as("Media de Indígenas")).show
+
+// COMMAND ----------
+
+// indigenas que ganan por encima de la media
+val dataIndiMedia = dataEtniaMas1.where($"ingreso_laboral" >= "297.09649890123956")
+println(dataIndiMedia.count)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC 9.De acuerdo a la pregunta anterior cuantos son hombres y mujeres. Muestre por cada año que se hizo la encuesta
+
+// COMMAND ----------
+
+// DBTITLE 1,Etnia Mestizos
+val dataMediaF1 = dataMesMedia.groupBy("anio").pivot("genero").count().orderBy("anio")
+dataMediaF1.show
+
+// COMMAND ----------
+
+display(dataMediaF1)
+
+// COMMAND ----------
+
+// DBTITLE 1,Etnia Indígena
+val dataMediaF2 = dataIndiMedia.groupBy("anio").pivot("genero").count().orderBy("anio")
+dataMediaF2.show
+
+// COMMAND ----------
+
+display(dataMediaF2)
