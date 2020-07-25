@@ -59,7 +59,12 @@ println(newData.count)
 
 // COMMAND ----------
 
-// hacemos un summary al ingreso_laboral para saber la cantidad de datos q hay y cual es el maximo
+// MAGIC %md
+// MAGIC Hacemos un summary al ingreso_laboral para saber la cantidad de datos q hay y cual es el maximo
+
+// COMMAND ----------
+
+
 newData.select("ingreso_laboral").summary().show()
 
 // COMMAND ----------
@@ -142,8 +147,9 @@ valMayorAllimSuperior.orderBy($"ingreso_laboral".desc).show(504742, false)
 
 // COMMAND ----------
 
+// DBTITLE 1,Data sin Outliers
 // MAGIC %md
-// MAGIC Data sin Outliers
+// MAGIC Es una observación que es numéricamente distante del resto de los datos
 
 // COMMAND ----------
 
@@ -151,7 +157,11 @@ val newDataSinOutliers = newData.where($"ingreso_laboral" > limInferior && $"ing
 
 // COMMAND ----------
 
-// realizamos un summary para saber la cantidad de datos y cual es el maximo
+// MAGIC %md
+// MAGIC Realizamos un summary para saber la cantidad de datos y cual es el maximo
+
+// COMMAND ----------
+
 newDataSinOutliers.select("ingreso_laboral").summary().show
 
 // COMMAND ----------
@@ -171,9 +181,18 @@ newDataSinOutliers.groupBy("etnia").count().sort($"count".desc).show
 
 // COMMAND ----------
 
-// Guardado de variable de la primera y segunda etnia que mas participa en el documento
+// MAGIC %md
+// MAGIC Se procede Guardado de variable de la primera y segunda etnia que mas participa en el documento
+
+// COMMAND ----------
+
 val dataEtniaMas1 = newDataSinOutliers.where($"etnia" === "6 - Mestizo")
 val dataEtniaMas2 = newDataSinOutliers.where($"etnia" === "1 - Indígena")
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC En las variables ya mencionadas se hace un pivote de la variable género donde tomara los únicos valores que poseea esta columna, además se lo agrupara por año para saber por los distintos años en donde se encuentra la mayor cantidad y se lo ordenara por esta mismo para una mejor visualización en tablas para cada una de las dos datas 
 
 // COMMAND ----------
 
@@ -184,6 +203,11 @@ println("Mestizos")
 dataGeneroMestizos.show
 println("Indígenas")
 dataGeneroIndigenas.show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC En la anterior consulta se lo pudo ver en lo que son tablas ahora se lo presentará por gráficas con la palabra reservada display
 
 // COMMAND ----------
 
@@ -202,8 +226,17 @@ display(dataGeneroIndigenas)
 
 // COMMAND ----------
 
-// consulta de las areas que hay
+// MAGIC %md
+// MAGIC Para poder sacar la siguiente pregunta se realiza la consulta de las areas que hay para poder responder
+
+// COMMAND ----------
+
 data.select("area").distinct().show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Tomando en cuenta con las 2 primeras datas en donde se tiene ya las 2 etnias mas guardadas se procede a realizar un pivo de género en donde con sus datos únicos se agrupara por área para mostrar en donde existen la mayor población 
 
 // COMMAND ----------
 
@@ -214,6 +247,11 @@ println("Mestizos")
 dataAreaMestizos.show
 println("Indígenas")
 dataAreaIndigenas.show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Con la anterior consulta ya presentada en tablas se la realiza de la misma manera por gráficas
 
 // COMMAND ----------
 
@@ -232,6 +270,11 @@ display(dataAreaIndigenas)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Trabajando con las 2 datas de las etnias se procede a hacer un pivote de la columana género y para poder responder la pregunta ya mencionada se saca el valor promedio de la variable ingreso_laboral y como se desea saber el area se la agrupa por esta mismo
+
+// COMMAND ----------
+
 val dataIngresoAvgMestizos = dataEtniaMas1.groupBy("area").pivot("genero").avg("ingreso_laboral").orderBy("area")
 val dataIngresoAvgIndigenas = dataEtniaMas2.groupBy("area").pivot("genero").avg("ingreso_laboral").orderBy("area")
 
@@ -239,6 +282,11 @@ println("Mestizos")
 dataIngresoAvgMestizos.show
 println("Indígenas")
 dataIngresoAvgIndigenas.show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Con los valores ya mencionados se realiza una gráfica de los mismos
 
 // COMMAND ----------
 
@@ -257,11 +305,21 @@ display(dataIngresoAvgIndigenas)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Para la siguiente consulta por cada data ya guardada de la etnia mestizo se procede a hacer un .where de esta misma data en donde por hombres y mujeres que se encuentren en la variable género se hace una igualdad por cada una de las 2 áreas únicas ya existentes en la misma
+
+// COMMAND ----------
+
 // DBTITLE 1,Ocupación mestizos
 val dataMestizosU_H = dataEtniaMas1.where($"genero" === "1 - Hombre" && $"area" === "1 - Urbana")
 val dataMestizosU_M = dataEtniaMas1.where($"genero" === "2 - Mujer" && $"area" === "1 - Urbana")
 val dataMestizosR_H = dataEtniaMas1.where($"genero" === "1 - Hombre" && $"area" === "2 - Rural")
 val dataMestizosR_M = dataEtniaMas1.where($"genero" === "2 - Mujer" && $"area" === "2 - Rural")
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Ya con la data obtenida de cada uno  de los hombres y mujeres de la etnia mestizos y por su área, se procede a sacar por cada una de las ya mencionadas el grupo_ocupacion y a realizar un conteo para poder ver en donde se encunetra una mayor afluencia de registros
 
 // COMMAND ----------
 
@@ -277,11 +335,21 @@ dataOcupacionMestizosR_M.show(false)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Para la siguiente consulta por cada data ya guardada de la etnia indígena se procede a hacer un .where de esta misma data en donde por hombres y mujeres que se encuentren en la variable género se hace una igualdad por cada una de las 2 áreas únicas ya existentes en la misma
+
+// COMMAND ----------
+
 // DBTITLE 1,Ocupación Indígenas
 val dataIndigenasU_H = dataEtniaMas2.where($"genero" === "1 - Hombre" && $"area" === "1 - Urbana")
 val dataIndigenasU_M = dataEtniaMas2.where($"genero" === "2 - Mujer" && $"area" === "1 - Urbana")
 val dataIndigenasR_H = dataEtniaMas2.where($"genero" === "1 - Hombre" && $"area" === "2 - Rural")
 val dataIndigenasR_M = dataEtniaMas2.where($"genero" === "2 - Mujer" && $"area" === "2 - Rural")
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Ya con la data obtenida de cada uno  de los hombres y mujeres de la etnia indígenas y por su área, se procede a sacar por cada una de las ya mencionadas el grupo_ocupacion y a realizar un conteo para poder ver en donde se encunetra una mayor afluencia de registros
 
 // COMMAND ----------
 
