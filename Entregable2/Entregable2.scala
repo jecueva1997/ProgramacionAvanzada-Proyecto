@@ -35,6 +35,11 @@ val data = spark
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC realizamos un .count al data para saber la catidad de filas que existen en el csv
+
+// COMMAND ----------
+
 //Saber la cantidad de filas que hay
 println($"TOTAL DE DATOS = ${data.count}")
 
@@ -64,13 +69,14 @@ println(newData.count)
 
 // COMMAND ----------
 
-
 newData.select("ingreso_laboral").summary().show()
 
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Dividimos los datos en rangos para saber cuales son los que mas hay
+// MAGIC Dividimos los datos en rangos para saber cuales son los que mas hay.
+// MAGIC 
+// MAGIC La variable minValor es igual a cero y maxvalor es igual a 146030 puesto que en el summary anterior se pudo observar cual es el minimo y cual es el maximo valor que hay en nuestro data con referencia al ingreso_laboral. Y para terminar dentro del while vamos contando cuantos datos dentro de los rangos (la variable bins contiene la cantidad de rangos que vamos a tener) existen y luego los presentamos.
 
 // COMMAND ----------
 
@@ -116,7 +122,9 @@ val stdDev = newData.select(stddev("ingreso_laboral")).first()(0).asInstanceOf[D
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Calculamos los limites
+// MAGIC Calculamos los limites.
+// MAGIC 
+// MAGIC Con la ayuda de la media y la desviación estandar calculamos los limites de nuestros valores de ingreso_laboral, en donde primeramente nuestro limInferior se puede observar que tiene un valor negativo y limSuperior un valor positivo, lo cual quiere decir que nuestros datos sin outliers deben estar entre estos rangos, y los demas datos ya sean menores al limInferior o mayores al limSuperior son los datos que se encuentran por asi decirlo de manera excesiva.
 
 // COMMAND ----------
 
@@ -130,9 +138,19 @@ val limSuperior = avg + 3 * stdDev
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Este filtro se hace solo con la intención de saber si existen datos por debajo del limInferior. Pero como se ve en los resultados no hay ninguno puesto que no hay un ingreso laboral que sea negativo.
+
+// COMMAND ----------
+
 // filtro de datos menos al limInferior
 val valInferiorAllimInferior = newData.where($"ingreso_laboral" < limInferior)
 valInferiorAllimInferior.describe().show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC En este filtro se buscan los datos que sean mayores al limSuperior. Aqui hay que tener algo en cuenta y es que estos datos al ser ya mayores al limSuperior se consideran excesivos por lo que ya se consideran datos outliers.
 
 // COMMAND ----------
 
@@ -149,7 +167,7 @@ valMayorAllimSuperior.orderBy($"ingreso_laboral".desc).show(504742, false)
 
 // DBTITLE 1,Data sin Outliers
 // MAGIC %md
-// MAGIC Es una observación que es numéricamente distante del resto de los datos
+// MAGIC A continuación guardamos solamente los datos que se encuentran entre estos limites ya mencionados anteriormente, ya que los que no se encuentran entre estos se consideran datos outliers y se quitarian de nuestra data.
 
 // COMMAND ----------
 
@@ -182,7 +200,7 @@ newDataSinOutliers.groupBy("etnia").count().sort($"count".desc).show
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Se procede Guardado de variable de la primera y segunda etnia que mas participa en el documento
+// MAGIC Como ya sabemos de que etnias hay mas datos gracias a la consulta anterior realizada, se procede a guardar en un data diferente para cada etnia toda la información que existe en nuestro dataSinOutliers que les corresponda a cada una.
 
 // COMMAND ----------
 
@@ -192,7 +210,7 @@ val dataEtniaMas2 = newDataSinOutliers.where($"etnia" === "1 - Indígena")
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC En las variables ya mencionadas se hace un pivote de la variable género donde tomara los únicos valores que poseea esta columna, además se lo agrupara por año para saber por los distintos años en donde se encuentra la mayor cantidad y se lo ordenara por esta mismo para una mejor visualización en tablas para cada una de las dos datas 
+// MAGIC En las variables ya mencionadas se hace un pivote de la variable género donde tomara los únicos valores que poseea esta columna, además se lo agrupara por año para saber por los distintos años en donde se encuentra la mayor cantidad de hombres y mujeres que han respondido la encuesta que se haya realizado para obtener este data y se lo ordenara por esta mismo para una mejor visualización en tablas para cada una de las dos datas 
 
 // COMMAND ----------
 
@@ -207,7 +225,7 @@ dataGeneroIndigenas.show
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC En la anterior consulta se lo pudo ver en lo que son tablas ahora se lo presentará por gráficas con la palabra reservada display
+// MAGIC En la anterior consulta se lo pudo ver en lo que son tablas ahora se lo presentará por gráficas con la palabra reservada display, con la intencion de saber de manera mas exacta en que año hubo mas hombres y en cual mas mujeres, puesto que la anterior se ordenaba por el año y no se sabia en donde se habia encuestado mas hombres que mujeres o viceversa.
 
 // COMMAND ----------
 
@@ -236,7 +254,7 @@ data.select("area").distinct().show
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Tomando en cuenta con las 2 primeras datas en donde se tiene ya las 2 etnias mas guardadas se procede a realizar un pivo de género en donde con sus datos únicos se agrupara por área para mostrar en donde existen la mayor población 
+// MAGIC Tomando en cuenta las 2 primeras datas en donde se tiene ya las 2 etnias mas mencionadas se procede a realizar un pivot de género con la intencion de saber en donde hay mas hombres y mujeres.
 
 // COMMAND ----------
 
@@ -251,7 +269,7 @@ dataAreaIndigenas.show
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Con la anterior consulta ya presentada en tablas se la realiza de la misma manera por gráficas
+// MAGIC Con la anterior consulta ya presentada en tablas, ahora se procede a mostrar por gráficas para tener una mejor visualizacion de los datos obtenidos.
 
 // COMMAND ----------
 
@@ -286,7 +304,7 @@ dataIngresoAvgIndigenas.show
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Con los valores ya mencionados se realiza una gráfica de los mismos
+// MAGIC Con los valores ya mencionados se realiza una gráfica de los mismos para mejor visualizacion de los datos obtenidos.
 
 // COMMAND ----------
 
@@ -306,7 +324,7 @@ display(dataIngresoAvgIndigenas)
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Para la siguiente consulta por cada data ya guardada de la etnia mestizo se procede a hacer un .where de esta misma data en donde por hombres y mujeres que se encuentren en la variable género se hace una igualdad por cada una de las 2 áreas únicas ya existentes en la misma
+// MAGIC En esta parte se procede a guardar para la etnia mestizos en cuatro datas diferentes a los hombres y mujeres que sean del area urbana y rural por separado y para esto nos ayudamos del .where en donde le especificamos de que datos nomas queremos que guarde en cada data nuevo.
 
 // COMMAND ----------
 
@@ -319,7 +337,7 @@ val dataMestizosR_M = dataEtniaMas1.where($"genero" === "2 - Mujer" && $"area" =
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Ya con la data obtenida de cada uno  de los hombres y mujeres de la etnia mestizos y por su área, se procede a sacar por cada una de las ya mencionadas el grupo_ocupacion y a realizar un conteo para poder ver en donde se encunetra una mayor afluencia de registros
+// MAGIC Ya con la data obtenida de cada uno  de los hombres y mujeres de la etnia mestizos y por su área, se procede a sacar por cada una de las ya mencionadas el grupo_ocupacion y a realizar un conteo para poder ver en donde se encunetra una mayor abundancia de registros.
 
 // COMMAND ----------
 
@@ -336,7 +354,7 @@ dataOcupacionMestizosR_M.show(false)
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Para la siguiente consulta por cada data ya guardada de la etnia indígena se procede a hacer un .where de esta misma data en donde por hombres y mujeres que se encuentren en la variable género se hace una igualdad por cada una de las 2 áreas únicas ya existentes en la misma
+// MAGIC En esta parte se procede a guardar para la etnia indigena en cuatro datas diferentes a los hombres y mujeres que sean del area urbana y rural por separado y para esto nos ayudamos del .where en donde le especificamos de que datos nomas queremos que guarde en cada data nuevo. Es decir se hace lo mismo que se hizo para los de la etnia mestizos.
 
 // COMMAND ----------
 
@@ -349,7 +367,7 @@ val dataIndigenasR_M = dataEtniaMas2.where($"genero" === "2 - Mujer" && $"area" 
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Ya con la data obtenida de cada uno  de los hombres y mujeres de la etnia indígenas y por su área, se procede a sacar por cada una de las ya mencionadas el grupo_ocupacion y a realizar un conteo para poder ver en donde se encunetra una mayor afluencia de registros
+// MAGIC Ya con la data obtenida de cada uno  de los hombres y mujeres de la etnia indígenas y por su área, se procede a sacar por cada una de las ya mencionadas el grupo_ocupacion y a realizar un conteo para poder ver en donde se encunetra una mayor afluencia de registros.
 
 // COMMAND ----------
 
@@ -370,9 +388,19 @@ dataOcupacionIndigenasR_M.show(false)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC De la data que contiene la información de la etnia mestizos, se realiza un pivot de la variable o columna genero en donde se agrupa y ordena por area y que mostrara como el resultado de la consulta el ingreso maximo que ganan los hombres y mujeres de cada area. No se saca el minimo del ingreso ya que como observamos en una de las consultas anteriores este tiene un valor de cero.
+
+// COMMAND ----------
+
 // DBTITLE 1,Ingreso Max de Mestizos
 val dataIngresoMaxMestizos = dataEtniaMas1.groupBy("area").pivot("genero").max("ingreso_laboral").orderBy("area")
 dataIngresoMaxMestizos.show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC A continuación se procede a mostrar de manera gráfica la consulta con la intención de visualizar de forma mas exacta quien tiene el mayor ingreso en cada una de las areas.
 
 // COMMAND ----------
 
@@ -380,9 +408,19 @@ display(dataIngresoMaxMestizos)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Al igual que la consulta anterior, de la data que contiene la información de la etnia indígena, se realiza un pivot de la variable o columna genero en donde se agrupa y ordena por area y que mostrara como el resultado de la consulta el ingreso maximo que ganan los hombres y mujeres de cada area. No se saca el minimo del ingreso ya que como observamos en una de las consultas anteriores este tiene un valor de cero.
+
+// COMMAND ----------
+
 // DBTITLE 1,Ingreso Max de Indígenas
 val dataIngresoMaxIndigenas = dataEtniaMas2.groupBy("area").pivot("genero").max("ingreso_laboral").orderBy("area")
 dataIngresoMaxIndigenas.show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Se procede a mostrar de manera gráfica la consulta con la intención de visualizar de forma mas exacta quien tiene el mayor ingreso en cada una de las areas de la etnia indígena.
 
 // COMMAND ----------
 
@@ -395,11 +433,21 @@ display(dataIngresoMaxIndigenas)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Con la ayuda de la consulta de la pregunta cinco con respecto a la etnia mestizos y con los data obtenidos en la pregunta cuatro se procede a mostrar en forma de tabla en que ocupación ganan el maximo los hombres y mujeres de cada area de la etnia mestizos, y para esto nos ayudamos con el .where en donde le damos los detalles de los datos que queremos.
+
+// COMMAND ----------
+
 // DBTITLE 1,Etnia Mestizos
 dataMestizosU_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2784").distinct.show(false)
 dataMestizosU_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2790").distinct.show(false)
 dataMestizosR_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2783").distinct.show(false)
 dataMestizosR_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2766").distinct.show(false)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Con la ayuda de la consulta de la pregunta cinco con respecto a la etnia indígena y con los data obtenidos en la pregunta cuatro se procede a mostrar en forma de tabla en que ocupación ganan el maximo los hombres y mujeres de cada area de la etnia indígena, y para esto nos ayudamos con el .where en donde le damos los detalles de los datos que queremos.
 
 // COMMAND ----------
 
@@ -416,6 +464,11 @@ dataIndigenasR_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area 
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Ahora que ya sabemos en que ocupación estan ganando el maximo los hobres y mujeres de cada area de la etnia mestizos. Se procede a consultar la rama de actividad en donde se encuentran ganando ese ingreso, y aqui de la misma forma que la antrior nos ayudamos del .where al cual ya le añadimos la ocupación aparte del ingreso maximo.
+
+// COMMAND ----------
+
 // DBTITLE 1,Etnia Mestizos
 dataMestizosU_H.select($"rama_actividad".as("Actividad de Hombres del area Urbana")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2784").show(false)
 
@@ -424,6 +477,11 @@ dataMestizosU_M.select($"rama_actividad".as("Actividad de Mujeres del area Urban
 dataMestizosR_H.select($"rama_actividad".as("Actividad de Hombres del area Rural")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2783").show(false)
 
 dataMestizosR_M.select($"rama_actividad".as("Actividad de Mujeres del area Rural")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2766").show(false)
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Ahora que ya sabemos en que ocupación estan ganando el maximo los hobres y mujeres de cada area de la etnia indigena. Se procede a consultar la rama de actividad en donde se encuentran ganando ese ingreso, y aqui de la misma forma que la antrior pregunta nos ayudamos del .where al cual ya le añadimos la ocupación aparte del ingreso maximo.
 
 // COMMAND ----------
 
@@ -443,9 +501,19 @@ dataIndigenasR_M.select($"rama_actividad".as("Actividad de Mujeres del area Rura
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Se realiza una pequeña consulta en donde tenemos como resultado el promedio o la media que ganan las personas de la etnia mestizos.
+
+// COMMAND ----------
+
 // DBTITLE 1,Etnia Mestizos
 // sacamos la media de todos los datos de mestizos sin outliers
 dataEtniaMas1.select(mean("ingreso_laboral").as("Media de Mestizos")).show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Ahora que ya sabemos cual es la media, se procede a realizar un .count pra contar a todas las personas que estan ganando por encima de la media en la etnia mestizos, y para esto en el .where le damos la condicion de que solo queremos que cuente a aquellos con un ingreso mayor o igual a la media.
 
 // COMMAND ----------
 
@@ -455,9 +523,19 @@ println(dataMesMedia.count)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Se realiza una pequeña consulta en donde tenemos como resultado el promedio o la media que ganan las personas de la etnia Indígena.
+
+// COMMAND ----------
+
 // DBTITLE 1,Etnia Indígena
 // sacamos la media de todos los datos de indigenas sin outliers
 dataEtniaMas2.select(mean("ingreso_laboral").as("Media de Indígenas")).show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Ahora que ya sabemos cual es la media, se procede a realizar un .count pra contar a todas las personas que estan ganando por encima de la media en la etnia indígena, y para esto en el .where le damos la condicion de que solo queremos que cuente a aquellos con un ingreso mayor o igual a la media.
 
 // COMMAND ----------
 
@@ -472,9 +550,19 @@ println(dataIndiMedia.count)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Como se puede observar en la pregunta anterior se guardo en un data a aquellos de la etnia mestizos que ganan por encia de la media. Y ya teniendo eso en cuenta se procede a realizar un pivot de genero en ese data, en donde se agrupa y ordena por año con la intencion de saber cuantos hombres y mujeres por cada año ganaron por encima de la media.
+
+// COMMAND ----------
+
 // DBTITLE 1,Etnia Mestizos
 val dataMediaF1 = dataMesMedia.groupBy("anio").pivot("genero").count().orderBy("anio")
 dataMediaF1.show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Para mejor visualización de los datos que se saco de la etnia mestizos anteriormente con el pivot, se muestra en forma de gráfica los datos para saber y poder consultar de forma mas exacta en donde hay mas hombres o mujeres que ganaron por encima de la media.
 
 // COMMAND ----------
 
@@ -482,9 +570,19 @@ display(dataMediaF1)
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC Como se puede observar en la pregunta anterior se guardo en un data a aquellos de la etnia indígena que ganan por encia de la media. Y ya teniendo eso en cuenta se procede a realizar un pivot de genero en ese data, en donde se agrupa y ordena por año con la intencion de saber cuantos hombres y mujeres por cada año ganaron por encima de la media.
+
+// COMMAND ----------
+
 // DBTITLE 1,Etnia Indígena
 val dataMediaF2 = dataIndiMedia.groupBy("anio").pivot("genero").count().orderBy("anio")
 dataMediaF2.show
+
+// COMMAND ----------
+
+// MAGIC %md
+// MAGIC Para mejor visualización de los datos que se saco de la etnia indígena anteriormente con el pivot, se muestra en forma de gráfica los datos para saber y poder consultar de forma mas exacta en donde hay mas hombres o mujeres que ganaron por encima de la media.
 
 // COMMAND ----------
 
