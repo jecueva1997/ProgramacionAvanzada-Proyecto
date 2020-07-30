@@ -1,4 +1,14 @@
 // Databricks notebook source
+// DBTITLE 1,Especificación del tipo de dato
+// MAGIC %md
+// MAGIC Para este apartado de la creación del dataFrame, primeramente se debe importar org.apache.spark.sql.types._ con la finalidad de que nos permita darle a cada columna el tipo de dato de nuestra preferencia, pero teniendo en cuenta que datos se guardan en ella, por ejemplo si esa columna tiene datos cadena no se le va a decir que sea de tipo IntegerType sino que aqui obligadamente debe ser StringType.
+// MAGIC 
+// MAGIC En la línea dos observamos la importación del .sql.types._ ya mencionado y a continuación dentro de una variable myDataSchema vamos a guardar toda la estructura y cambios que queremos que tengan nuestro data para su creación.
+// MAGIC 
+// MAGIC Dentro de un arreglo (línea de codigo 4 a la 22) especificamos las estructuras para el data, en donde en primer lugar por cada columna que tiene el archivo .csv que se va a convertir en DataFrame se debe colocar StructField() y dentro de este primeramente el nombre de la columna, seguido del tipo de dato, en esta parte se debe colocar el tamaño máximo que queremos que tenga esa columna solo cuando especifiques un dato decimal por ejemplo la línea de código 5 en otros casos no viene a ser necesario y por último si deseas que esta tenga datos nulos (tru para que si tenga datos nulos y false para que no tenga datos nulos).
+
+// COMMAND ----------
+
 // Lectura de datos
 import org.apache.spark.sql.types._
 val myDataSchema = StructType(
