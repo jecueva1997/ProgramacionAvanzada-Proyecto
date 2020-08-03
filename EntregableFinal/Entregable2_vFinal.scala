@@ -225,12 +225,17 @@ spark.sql("""
 
 // COMMAND ----------
 
-spark.sql("""
+val dataEtnias = spark.sql("""
   SELECT etnia, COUNT(*) total
   FROM AnalisisSQL5
   GROUP BY etnia
   ORDER BY COUNT(*) DESC
-""").show
+""")
+dataEtnias.show
+
+// COMMAND ----------
+
+display(dataEtnias)
 
 // COMMAND ----------
 
@@ -502,10 +507,10 @@ dataIngresoMaxIndigenas.show
 // COMMAND ----------
 
 // DBTITLE 1,Etnia Mestizos
-dataMestizosU_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2784").distinct.show(false)
-dataMestizosU_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2790").distinct.show(false)
-dataMestizosR_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2783").distinct.show(false)
-dataMestizosR_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2766").distinct.show(false)
+dataEtniaMas1.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Urbana")).where($"genero" === "1 - Hombre" && $"area" === "1 - Urbana" && $"ingreso_laboral" === "2784").distinct.show(false)
+dataEtniaMas1.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Urbana")).where($"genero" === "2 - Mujer" && $"area" === "1 - Urbana" && $"ingreso_laboral" === "2790").distinct.show(false)
+dataEtniaMas1.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Rural")).where($"genero" === "1 - Hombre" && $"area" === "2 - Rural" && $"ingreso_laboral" === "2783").distinct.show(false)
+dataEtniaMas1.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Rural")).where($"genero" === "2 - Mujer" && $"area" === "2 - Rural" && $"ingreso_laboral" === "2766").distinct.show(false)
 
 // COMMAND ----------
 
@@ -515,10 +520,10 @@ dataMestizosR_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area R
 // COMMAND ----------
 
 // DBTITLE 1,Etnia Indígena
-dataIndigenasU_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2764").distinct.show(false)
-dataIndigenasU_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Urbana")).where($"ingreso_laboral" === "2780").distinct.show(false)
-dataIndigenasR_H.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2790").distinct.show(false)
-dataIndigenasR_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Rural")).where($"ingreso_laboral" === "2741").distinct.show(false)
+dataEtniaMas2.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Urbana")).where($"genero" === "1 - Hombre" && $"area" === "1 - Urbana" && $"ingreso_laboral" === "2764").distinct.show(false)
+dataEtniaMas2.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Urbana")).where($"genero" === "2 - Mujer" && $"area" === "1 - Urbana" && $"ingreso_laboral" === "2780").distinct.show(false)
+dataEtniaMas2.select($"grupo_ocupacion".as("Hombres con Ingreso max del area Rural")).where($"genero" === "1 - Hombre" && $"area" === "2 - Rural" && $"ingreso_laboral" === "2790").distinct.show(false)
+dataEtniaMas2.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area Rural")).where($"genero" === "2 - Mujer" && $"area" === "2 - Rural" && $"ingreso_laboral" === "2741").distinct.show(false)
 
 // COMMAND ----------
 
@@ -528,18 +533,18 @@ dataIndigenasR_M.select($"grupo_ocupacion".as("Mujeres con Ingreso max del area 
 // COMMAND ----------
 
 // MAGIC %md
-// MAGIC Ahora que ya sabemos en que ocupación estan ganando el máximo los hobres y mujeres de cada area de la etnia mestizos. Se procede a consultar la rama de actividad en donde se encuentran ganando ese ingreso, y aqui de la misma forma que la anterior pregunta nos ayudamos del .where al cual ya le añadimos la ocupación aparte del ingreso máximo.
+// MAGIC Ahora que ya sabemos en que ocupación estan ganando el máximo los hombres y mujeres de cada area de la etnia mestizos. Se procede a consultar la rama de actividad en donde se encuentran ganando ese ingreso, y aqui de la misma forma que la anterior pregunta nos ayudamos del .where al cual ya le añadimos la ocupación aparte del ingreso máximo.
 
 // COMMAND ----------
 
 // DBTITLE 1,Etnia Mestizos
-dataMestizosU_H.select($"rama_actividad".as("Actividad de Hombres del area Urbana")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2784").show(false)
+dataEtniaMas1.select($"rama_actividad".as("Actividad de Hombres del area Urbana")).where($"genero" === "1 - Hombre" && $"area" === "1 - Urbana" && $"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2784").show(false)
 
-dataMestizosU_M.select($"rama_actividad".as("Actividad de Mujeres del area Urbana")).where(($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" || $"grupo_ocupacion" === "03 - Técnicos y profesionales de nivel medio") && $"ingreso_laboral" === "2790").show(false)
+dataEtniaMas1.select($"rama_actividad".as("Actividad de Mujeres del area Urbana")).where($"genero" === "2 - Mujer" && $"area" === "1 - Urbana" && ($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" || $"grupo_ocupacion" === "03 - Técnicos y profesionales de nivel medio") && $"ingreso_laboral" === "2790").show(false)
 
-dataMestizosR_H.select($"rama_actividad".as("Actividad de Hombres del area Rural")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2783").show(false)
+dataEtniaMas1.select($"rama_actividad".as("Actividad de Hombres del area Rural")).where($"genero" === "1 - Hombre" && $"area" === "2 - Rural" && $"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2783").show(false)
 
-dataMestizosR_M.select($"rama_actividad".as("Actividad de Mujeres del area Rural")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2766").show(false)
+dataEtniaMas1.select($"rama_actividad".as("Actividad de Mujeres del area Rural")).where($"genero" === "2 - Mujer" && $"area" === "2 - Rural" && $"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2766").show(false)
 
 // COMMAND ----------
 
@@ -549,13 +554,13 @@ dataMestizosR_M.select($"rama_actividad".as("Actividad de Mujeres del area Rural
 // COMMAND ----------
 
 // DBTITLE 1,Etnia Indígena
-dataIndigenasU_H.select($"rama_actividad".as("Actividad de Hombres del area Urbana")).where($"grupo_ocupacion" === "05 - Trabajad. de los servicios y comerciantes" && $"ingreso_laboral" === "2764").show(false)
+dataEtniaMas2.select($"rama_actividad".as("Actividad de Hombres del area Urbana")).where($"genero" === "1 - Hombre" && $"area" === "1 - Urbana" && $"grupo_ocupacion" === "05 - Trabajad. de los servicios y comerciantes" && $"ingreso_laboral" === "2764").show(false)
 
-dataIndigenasU_M.select($"rama_actividad".as("Actividad de Mujeres del area Urbana")).where($"grupo_ocupacion" === "05 - Trabajad. de los servicios y comerciantes" && $"ingreso_laboral" === "2780").show(false)
+dataEtniaMas2.select($"rama_actividad".as("Actividad de Mujeres del area Urbana")).where($"genero" === "2 - Mujer" && $"area" === "1 - Urbana" && $"grupo_ocupacion" === "05 - Trabajad. de los servicios y comerciantes" && $"ingreso_laboral" === "2780").show(false)
 
-dataIndigenasR_H.select($"rama_actividad".as("Actividad de Hombres del area Rural")).where($"grupo_ocupacion" === "01 - Personal direct./admin. pública y empresas" && $"ingreso_laboral" === "2790").show(false)
+dataEtniaMas2.select($"rama_actividad".as("Actividad de Hombres del area Rural")).where($"genero" === "1 - Hombre" && $"area" === "2 - Rural" && $"grupo_ocupacion" === "01 - Personal direct./admin. pública y empresas" && $"ingreso_laboral" === "2790").show(false)
 
-dataIndigenasR_M.select($"rama_actividad".as("Actividad de Mujeres del area Rural")).where($"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2741").show(false)
+dataEtniaMas2.select($"rama_actividad".as("Actividad de Mujeres del area Rural")).where($"genero" === "2 - Mujer" && $"area" === "2 - Rural" && $"grupo_ocupacion" === "02 - Profesionales científicos e intelectuales" && $"ingreso_laboral" === "2741").show(false)
 
 // COMMAND ----------
 
